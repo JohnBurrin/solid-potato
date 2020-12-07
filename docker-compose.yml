@@ -1,0 +1,127 @@
+version: '3'
+services:
+  app:
+    build:
+      context: ./
+      dockerfile: .docker/app/Dockerfile
+      args:
+        debug: "true"
+    ports:
+      - "80:80"
+    volumes:
+      - ./app:/var/www/app
+      - ./config:/var/www/config
+      - ./routes:/var/www/routes
+      - ./database:/var/www/database
+      - ./html/vendor:/var/www/html/vendor
+      - ./resources:/var/www/resources
+      - ./tests:/var/www/tests
+      - ./phpstan.neon:/var/www/phpstan.neon
+      - ./composer.json:/var/www/composer.json
+      - ./composer.lock:/var/www/composer.lock
+      - ./webpack.mix.js:/var/www/webpack.mix.js
+      - ./.env:/var/www/.env
+    networks:
+      - "backend"
+    environment:
+      - DB_HOST=mysql
+      - DB_DATABASE=backpack
+      - DB_USERNAME=backpack
+      - DB_PASSWORD=backpack
+      - REDIS_HOST=redis
+      - COMPOSER_MEMORY_LIMIT=-1
+
+  mysql:
+    image: mysql:5.7.29
+    command: --explicit_defaults_for_timestamp="ON"
+    networks:
+      - "backend"
+    ports:
+      - "3306:3306"
+    volumes:
+      - dbdata:/var/lib/mysql
+    environment:
+      - MYSQL_DATABASE=backpack
+      - MYSQL_USER=backpack
+      - MYSQL_PASSWORD=backpack
+      - MYSQL_RANDOM_ROOT_PASSWORD=yes
+
+  queue:
+    build:
+      context: ./
+      dockerfile: .docker/worker/Dockerfile
+      args:
+        debug: "true"
+    volumes:
+      - ./app:/var/www/app
+      - ./config:/var/www/config
+      - ./resources:/var/www/resources
+      - ./composer.json:/var/www/composer.json
+      - ./composer.lock:/var/www/composer.lock
+      - ./.env:/var/www/.env
+    networks:
+      - "backend"
+    environment:
+      - DB_HOST=mysql
+      - DB_DATABASE=backpack
+      - DB_USERNAME=backpack
+      - DB_PASSWORD=backpack
+      - REDIS_HOST=redis
+
+  redis:
+    image: redis:5.0.4-alpine
+    networks:
+      - "backend"
+    restart: always
+
+  testdb:
+    image: mysql:5.7.29
+    networks:
+      - "test"
+    ports:
+      - "3307:3306"
+    environment:
+      - MYSQL_DATABASE=backpack
+      - MYSQL_USER=backpack
+      - MYSQL_PASSWORD=backpack
+      - MYSQL_RANDOM_ROOT_PASSWORD=yes
+
+  testapp:
+    build:
+      context: ./
+      dockerfile: .docker/app/Dockerfile
+      args:
+        debug: "true"
+    volumes:
+      - ./app:/var/www/app
+      - ./config:/var/www/config
+      - ./routes:/var/www/routes
+      - ./database:/var/www/database
+      - ./html/vendor:/var/www/html/vendor
+      - ./resources:/var/www/resources
+      - ./tests:/var/www/tests
+      - ./phpstan.neon:/var/www/phpstan.neon
+      - ./composer.json:/var/www/composer.json
+      - ./composer.lock:/var/www/composer.lock
+      - ./webpack.mix.js:/var/www/webpack.mix.js
+      - ./phpunit.xml:/var/www/phpunit.xml
+      - ./build:/var/www/build
+      - ./build/test-logs:/var/www/storage/logs
+    networks:
+      - "test"
+    environment:
+      - APP_ENV=testing
+      - DB_HOST=testdb
+      - DB_DATABASE=backpack
+      - DB_USERNAME=backpack
+      - DB_PASSWORD=backpack
+      - COMPOSER_MEMORY_LIMIT=-1
+      - CACHE_DRIVER=array
+      - SESSION_DRIVER=array
+
+networks:
+  backend:
+  test:
+
+volumes:
+  dbdata:
