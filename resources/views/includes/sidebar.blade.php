@@ -16,14 +16,12 @@
               </a>
           </li>
 
-        @foreach ($pages as $page)
-            <li class="nav-item">
-                <a class="nav-link" href="/{{ $page->slug }}">
-                    <i class="la la-file-alt nav-icon"></i>
-                    {{ $page->name }}
-                </a>
-            </li>
-        @endforeach
+          @foreach (Backpack\MenuCRUD\app\Models\MenuItem::getTree(); as $item)
+            <a class="no-underline hover:underline p-3"
+               href="{{$item->url()}}">
+               {{ $item->name }}
+            </a>
+          @endforeach
           <!-- ======================================= -->
           <!-- <li class="divider"></li> -->
           <!-- <li class="nav-title">Entries</li> -->

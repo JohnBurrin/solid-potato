@@ -16,3 +16,5 @@
 	</ul>
 </li>
 @endrole
+
+<li class='nav-item'><a class='nav-link' href='{{ backpack_url('menu-item') }}'><i class='nav-icon la la-list'></i> <span>Menu</span></a></li>
