@@ -16,12 +16,40 @@
               </a>
           </li>
 
-          @foreach (Backpack\MenuCRUD\app\Models\MenuItem::getTree(); as $item)
-            <a class="no-underline hover:underline p-3"
-               href="{{$item->url()}}">
-               {{ $item->name }}
-            </a>
-          @endforeach
+          @foreach(App\Models\MenuItem::getTree() as $menuItem)
+                     @if($menuItem->children->isEmpty())
+                         <li>
+                             <a href="{{$menuItem->url()}}">
+                                 @if($menuItem->icon)
+                                     <i class="fa {{$menuItem->icon}}"></i>
+                                 @endif
+                                 <span>{{$menuItem->name}}</span>
+                             </a>
+                         </li>
+                     @else
+                         <li class="treeview">
+                             <a href="#">
+                                 @if($menuItem->icon)
+                                     <i class="fa {{$menuItem->icon}}"></i>
+                                 @endif
+                                 <span>{{$menuItem->name}}</span>
+                                 <i class="fa fa-angle-left pull-right"></i>
+                             </a>
+                             <ul class="treeview-menu">
+                                 @foreach($menuItem->children as $child)
+                                     <li>
+                                         <a href="{{$child->url()}}">
+                                             @if($child->icon)
+                                                 <i class="fa {{$child->icon}}"></i>
+                                             @endif
+                                             <span>{{$child->name}}</span>
+                                         </a>
+                                     </li>
+                                 @endforeach
+                             </ul>
+                         </li>
+                     @endif
+                 @endforeach
           <!-- ======================================= -->
           <!-- <li class="divider"></li> -->
           <!-- <li class="nav-title">Entries</li> -->
