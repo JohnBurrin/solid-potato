@@ -18,19 +18,23 @@
 
           @foreach(App\Models\MenuItem::getTree() as $menuItem)
                      @if($menuItem->children->isEmpty())
-                         <li>
-                             <a href="{{$menuItem->url()}}">
+                         <li class="nav-item">
+                             <a class="nav-link" href="{{$menuItem->url()}}">
                                  @if($menuItem->icon)
                                      <i class="fa {{$menuItem->icon}}"></i>
+                                     @else
+                                     <i class="la la-file-alt nav-icon"></i>
                                  @endif
                                  <span>{{$menuItem->name}}</span>
                              </a>
                          </li>
                      @else
                          <li class="treeview">
-                             <a href="#">
+                             <a href="{{$menuItem->url()}}">
                                  @if($menuItem->icon)
                                      <i class="fa {{$menuItem->icon}}"></i>
+                                @else
+                                    <i class="la la-file-alt nav-icon"></i>
                                  @endif
                                  <span>{{$menuItem->name}}</span>
                                  <i class="fa fa-angle-left pull-right"></i>
@@ -38,7 +42,7 @@
                              <ul class="treeview-menu">
                                  @foreach($menuItem->children as $child)
                                      <li>
-                                         <a href="{{$child->url()}}">
+                                         <a  class="nav-link" href="{{$child->url()}}">
                                              @if($child->icon)
                                                  <i class="fa {{$child->icon}}"></i>
                                              @endif
